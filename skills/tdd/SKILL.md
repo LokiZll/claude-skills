@@ -116,6 +116,102 @@ export function calculateLiquidityScore(market: MarketData): number {
 
 ---
 
+## 后端测试示例 (Java)
+
+### 单元测试 (JUnit 5)
+
+```java
+// src/main/java/com/app/service/OrderService.java
+@Service
+public class OrderService {
+
+    public BigDecimal calculateTotal(List<OrderItem> items) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+}
+
+// src/test/java/com/app/service/OrderServiceTest.java
+@ExtendWith(MockitoExtension.class)
+class OrderServiceTest {
+
+    @InjectMocks
+    private OrderService orderService;
+
+    @Test
+    void shouldCalculateTotalCorrectly() {
+        List<OrderItem> items = List.of(
+            new OrderItem("P1", 2, new BigDecimal("10.00")),
+            new OrderItem("P2", 1, new BigDecimal("5.00"))
+        );
+
+        BigDecimal total = orderService.calculateTotal(items);
+
+        assertEquals(new BigDecimal("25.00"), total);
+    }
+
+    @Test
+    void shouldReturnZeroForEmptyList() {
+        BigDecimal total = orderService.calculateTotal(List.of());
+        assertEquals(BigDecimal.ZERO, total);
+    }
+
+    @Test
+    void shouldThrowExceptionForNullItems() {
+        assertThrows(NullPointerException.class,
+            () -> orderService.calculateTotal(null));
+    }
+}
+```
+
+### Spring Boot 集成测试
+
+```java
+@WebMvcTest(UserController.class)
+class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    void shouldCreateUser() throws Exception {
+        when(userService.createUser(any())).thenReturn(1L);
+
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"test@example.com\",\"name\":\"Test\"}"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(1));
+    }
+
+    @Test
+    void shouldReturn404WhenUserNotFound() throws Exception {
+        when(userService.getUser(999L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/users/999"))
+            .andExpect(status().isNotFound());
+    }
+}
+```
+
+### 命令
+
+```bash
+# Maven
+./mvnw test                    # 运行测试
+./mvnw test -Dtest=OrderServiceTest  # 运行特定测试
+./mvnw jacoco:report           # 生成覆盖率报告
+
+# Gradle
+./gradlew test                 # 运行测试
+./gradlew test --tests "*.OrderServiceTest"  # 特定测试
+./gradlew jacocoTestReport     # 覆盖率报告
+```
+
+---
+
 # E2E 测试（Playwright）
 
 关键用户流程的端到端测试。
