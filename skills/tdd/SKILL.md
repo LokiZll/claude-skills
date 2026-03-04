@@ -248,31 +248,6 @@ await page.waitForResponse(resp => resp.url().includes('/api/data'))  // 好
 await page.waitForTimeout(5000)                                        // 坏
 ```
 
-## CI/CD 集成
-
-```yaml
-# .github/workflows/e2e.yml
-name: E2E Tests
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npx playwright install --with-deps
-      - run: npx playwright test
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-```
-
----
-
 ## 质量检查清单
 
 - [ ] 所有公共函数都有单元测试
